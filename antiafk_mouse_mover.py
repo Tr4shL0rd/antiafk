@@ -1,8 +1,10 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from typing import Tuple
 from sys import argv
 import pyautogui
+from pyautogui import Point
 from time import sleep
 import datetime
 
@@ -19,7 +21,7 @@ def get_current_time() -> str:
 
     Returns:
     -------
-    * str: The current time in the specified format.
+    * `str`: The current time in the specified format.
 
     Note:
     ----
@@ -32,13 +34,13 @@ def get_current_time() -> str:
     time_str = time.strftime("[%H:%M:%S | %d/%m/%Y]")
     return time_str
 
-def split_xy(xy:tuple) -> tuple:
+def split_xy(xy:Point) -> Tuple[float,float]:
     """
     Split a tuple of x and y coordinates into separate variables.
 
     Parameters:
     ----------
-    * xy (tuple): A tuple of x and y coordinates.
+    * xy `Point`: A tuple of x and y coordinates.
 
     Returns:
     -------
@@ -49,19 +51,19 @@ def split_xy(xy:tuple) -> tuple:
     * Does the same as x,y = xy[0], xy[1]
     """
 
-    return (xy[0], xy[1])
+    return (xy[0],xy[1])
 
-def is_near(xy:tuple, center_x:int, center_y:int, radius:int) -> bool:
+def is_near(xy:Point, center_x:int, center_y:int, radius:int) -> bool:
     """
     Check if the position (x, y) is within a certain distance of the center position (center_x, center_y).
 
     Parameters:
     ----------
-    * x (int): The x-coordinate of the position to check.
-    * y (int): The y-coordinate of the position to check.
-    * center_x (int): The x-coordinate of the center position.
-    * center_y (int): The y-coordinate of the center position.
-    * radius (int): The maximum distance from the center position that the position (x, y) is allowed to be.
+    * x        `int`: The x-coordinate of the position to check.
+    * y        `int`: The y-coordinate of the position to check.
+    * center_x `int`: The x-coordinate of the center position.
+    * center_y `int`: The y-coordinate of the center position.
+    * radius   `int`: The maximum distance from the center position that the position (x, y) is allowed to be.
 
     Returns:
     -------
@@ -76,15 +78,15 @@ def is_near(xy:tuple, center_x:int, center_y:int, radius:int) -> bool:
     x,y = split_xy(xy)
     distance = ((x - center_x) ** 2 + (y - center_y) ** 2) ** 0.5
     # Return whether the distance is less than or equal to the given radius
-    return distance <= radius
+    return bool(distance <= radius)
 
-def jiggle_mouse(xy:tuple) -> None:
+def jiggle_mouse(xy:Point) -> None:
     """
     Jiggle the mouse around the given position (x, y).
 
     Parameters:
     ----------
-    * xy (tuple): A tuple of x and y coordinates.
+    * xy `tuple`: A tuple of x and y coordinates.
 
     Returns:
     ------
@@ -101,8 +103,8 @@ with open("logs/mouse_mover.log", "a") as f:
     f.write(f"{get_current_time()}: STARTING at position {ORIGIN} |{DEBUG = }|{SLEEP_TIME = }|\n")
 
 def main() -> None:
+    pos = Point(pyautogui.position()[0], pyautogui.position()[1])
     pyautogui.moveTo(CENTER_LEFT)
-    pos = pyautogui.position()
     while is_near(pos, CENTER_LEFT[0], CENTER_LEFT[1], radius=10): # checks if mouse is around CENTER_LEFT
         jiggle_mouse(pos)
         for i in range(SLEEP_TIME,0,-1):
@@ -110,15 +112,14 @@ def main() -> None:
             sleep(1)
         pyautogui.moveTo(pos) # resets mouse pos
         with open("logs/mouse_mover.log", "a") as f:
-            f.write(f"{get_current_time()}: MOVED TO {split_xy(CENTER_LEFT)}\n")
+            f.write(f"{get_current_time()}: MOVED TO {split_xy(pos)}\n")
     print("stopped")
     with open("logs/mouse_mover.log","a") as f:
         f.write(f"{get_current_time()}: STOPPED by moving mouse\n")
 
 try:
-
-    main()
-
+    if __name__ == "__main__":
+        main()
 except KeyboardInterrupt:
     with open("logs/mouse_mover.log","a") as f:
         f.write(f"{get_current_time()}: STOPPED by KeyboardInterrut\n")
