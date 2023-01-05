@@ -13,7 +13,7 @@ try:
 except IndexError:
     DEBUG = False
 
-def get_current_time():
+def get_current_time() -> str:
     """
     Get the current time in the format [HH:MM:SS | dd/mm/YYYY].
 
@@ -32,7 +32,7 @@ def get_current_time():
     time_str = time.strftime("[%H:%M:%S | %d/%m/%Y]")
     return time_str
 
-def split_xy(xy:tuple):
+def split_xy(xy:tuple) -> tuple:
     """
     Split a tuple of x and y coordinates into separate variables.
 
@@ -43,11 +43,15 @@ def split_xy(xy:tuple):
     Returns:
     -------
     * tuple: A tuple containing the separate x and y variables.
+
+    Note:
+    ----
+    * Does the same as x,y = xy[0], xy[1]
     """
 
     return (xy[0], xy[1])
 
-def is_near(xy:tuple, center_x, center_y, radius):
+def is_near(xy:tuple, center_x:int, center_y:int, radius:int) -> bool:
     """
     Check if the position (x, y) is within a certain distance of the center position (center_x, center_y).
 
@@ -74,7 +78,7 @@ def is_near(xy:tuple, center_x, center_y, radius):
     # Return whether the distance is less than or equal to the given radius
     return distance <= radius
 
-def jiggle_mouse(xy:tuple):
+def jiggle_mouse(xy:tuple) -> None:
     """
     Jiggle the mouse around the given position (x, y).
 
@@ -94,15 +98,15 @@ CENTER_LEFT = (1,500)
 SLEEP_TIME = 60 if not DEBUG else int(argv[1])
 ORIGIN = pyautogui.position()
 with open("logs/mouse_mover.log", "a") as f:
-    f.write(f"{get_current_time()}: STARTING at position {ORIGIN} {DEBUG = }\n")
+    f.write(f"{get_current_time()}: STARTING at position {ORIGIN} |{DEBUG = }|{SLEEP_TIME = }|\n")
 
-def main():
+def main() -> None:
     pyautogui.moveTo(CENTER_LEFT)
     pos = pyautogui.position()
     while is_near(pos, CENTER_LEFT[0], CENTER_LEFT[1], radius=10): # checks if mouse is around CENTER_LEFT
         jiggle_mouse(pos)
         for i in range(SLEEP_TIME,0,-1):
-            print(f"\rmoving mouse in {i} seconds"if i > 9 else f"\rmoving mouse in 0{i} seconds", end="" )
+            print(f"\rmoving mouse in {i} seconds" if i > 9 else f"\rmoving mouse in 0{i} seconds", end="" )
             sleep(1)
         pyautogui.moveTo(pos) # resets mouse pos
         with open("logs/mouse_mover.log", "a") as f:
