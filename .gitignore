@@ -1,1 +1,2 @@
-logs/mouse_mover.log
+logs/*
+reports/*
