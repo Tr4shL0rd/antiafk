@@ -13,7 +13,7 @@ from pyautogui import Point
 logging.basicConfig(
         filename="logs/mouse_mover.log",
         encoding="utf-8",
-        format="%(asctime)s: %(message)s",
+        format="[%(asctime)s]: %(message)s",
         level=logging.INFO
     )
 
@@ -44,7 +44,7 @@ def split_xy(xy_pos: Point) -> Tuple[float, float]:
     return (xy_pos[0], xy_pos[1])
 
 
-def is_near(xy_pos: Point, center_x: int, center_y: int, radius: int) -> bool:
+def is_near(xy_pos: Point, center_x: float, center_y: float, radius: int) -> bool:
     """
     Check if the position (x, y) is within a certain distance of the center position
     (center_x, center_y).
@@ -92,7 +92,7 @@ def jiggle_mouse(xy_pos: Point) -> None:
     pyautogui.moveTo(x_pos, y_pos + 1)
 
 
-CENTER_LEFT = (1, 500)
+CENTER_LEFT = Point(1, 500)
 SLEEP_TIME = 60 if not DEBUG else int(argv[1])
 ORIGIN = pyautogui.position()
 
@@ -102,9 +102,11 @@ def main() -> None:
     """main entry point of script"""
     pos = Point(pyautogui.position()[0], pyautogui.position()[1])
     pyautogui.moveTo(CENTER_LEFT)
+    loop_num = 0
     while is_near(
         pos, CENTER_LEFT[0], CENTER_LEFT[1], radius=10
     ):  # checks if mouse is around CENTER_LEFT
+        loop_num += 1
         jiggle_mouse(pos)
         for i in range(SLEEP_TIME, 0, -1):
             print(
@@ -115,7 +117,7 @@ def main() -> None:
             )
             sleep(1)
         pyautogui.moveTo(pos)  # resets mouse pos
-        logging.info("MOVED TO %s", split_xy(pos))
+        logging.info("(LOOP #%s) MOVED TO %s", loop_num, split_xy(pos))
     print("stopped")
     logging.info("STOPPED by moving mouse")
 
