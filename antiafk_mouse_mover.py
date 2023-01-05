@@ -1,13 +1,18 @@
+#! /usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from sys import argv
 import pyautogui
 from time import sleep
 import datetime
+
 DEBUG = False
 try:
     if len(argv) >= 2:
         DEBUG = True
 except IndexError:
     DEBUG = False
+
 def get_current_time():
     """
     Get the current time in the format [HH:MM:SS | dd/mm/YYYY].
@@ -26,6 +31,7 @@ def get_current_time():
     # Format the time as a string in the desired format
     time_str = time.strftime("[%H:%M:%S | %d/%m/%Y]")
     return time_str
+
 def split_xy(xy:tuple):
     """
     Split a tuple of x and y coordinates into separate variables.
@@ -40,6 +46,7 @@ def split_xy(xy:tuple):
     """
 
     return (xy[0], xy[1])
+
 def is_near(xy:tuple, center_x, center_y, radius):
     """
     Check if the position (x, y) is within a certain distance of the center position (center_x, center_y).
@@ -88,6 +95,7 @@ SLEEP_TIME = 60 if not DEBUG else int(argv[1])
 ORIGIN = pyautogui.position()
 with open("logs/mouse_mover.log", "a") as f:
     f.write(f"{get_current_time()}: STARTING at position {ORIGIN} {DEBUG = }\n")
+
 def main():
     pyautogui.moveTo(CENTER_LEFT)
     pos = pyautogui.position()
@@ -102,13 +110,17 @@ def main():
     print("stopped")
     with open("logs/mouse_mover.log","a") as f:
         f.write(f"{get_current_time()}: STOPPED by moving mouse\n")
+
 try:
+
     main()
+
 except KeyboardInterrupt:
     with open("logs/mouse_mover.log","a") as f:
         f.write(f"{get_current_time()}: STOPPED by KeyboardInterrut\n")
     print("EXITING...")
     exit()
+
 except pyautogui.FailSafeException:
     with open("logs/mouse_mover.log", "a") as f:
         f.write(f"{get_current_time()}: COULD NOT START! mouse in a corner\n")
