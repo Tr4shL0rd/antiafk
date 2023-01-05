@@ -6,12 +6,16 @@ from typing import Tuple
 from sys import argv
 import sys
 from time import sleep
-import datetime
 import logging
 import pyautogui
 from pyautogui import Point
 
-logging.basicConfig(filename="logs/mouse_mover.log", encoding="utf-8", format="%(asctime)s: %(message)s", level=logging.INFO)
+logging.basicConfig(
+        filename="logs/mouse_mover.log",
+        encoding="utf-8",
+        format="%(asctime)s: %(message)s",
+        level=logging.INFO
+    )
 
 DEBUG = False
 try:
@@ -19,27 +23,6 @@ try:
         DEBUG = True
 except IndexError:
     DEBUG = False
-
-
-def get_current_time() -> str:
-    """
-    Get the current time in the format [HH:MM:SS | dd/mm/YYYY].
-
-    Returns:
-    -------
-    * `str`: The current time in the specified format.
-
-    Note:
-    ----
-    * Created by OpenAI's ChatGPT AI
-    """
-
-    # Get the current time
-    time = datetime.datetime.now()
-    # Format the time as a string in the desired format
-    time_str = time.strftime("[%H:%M:%S | %d/%m/%Y]")
-    return time_str
-
 
 def split_xy(xy_pos: Point) -> Tuple[float, float]:
     """
@@ -113,7 +96,7 @@ CENTER_LEFT = (1, 500)
 SLEEP_TIME = 60 if not DEBUG else int(argv[1])
 ORIGIN = pyautogui.position()
 
-logging.info(f"STARTING at position {ORIGIN} |{DEBUG = }|{SLEEP_TIME = }|")
+logging.info("STARTING at position %s |DEBUG = %s|SLEEP_TIME = %s|", ORIGIN, DEBUG, SLEEP_TIME)
 
 def main() -> None:
     """main entry point of script"""
@@ -132,9 +115,9 @@ def main() -> None:
             )
             sleep(1)
         pyautogui.moveTo(pos)  # resets mouse pos
-        logging.info(f"MOVED TO {split_xy(pos)}")
+        logging.info("MOVED TO %s", split_xy(pos))
     print("stopped")
-    logging.info(f"STOPPED by moving mouse")
+    logging.info("STOPPED by moving mouse")
 
 
 try:
@@ -142,7 +125,7 @@ try:
         pyautogui.moveTo(CENTER_LEFT)
         main()
 except KeyboardInterrupt:
-    logging.info(f"STOPPED by KeyboardInterrupt")
+    logging.info("STOPPED by KeyboardInterrupt")
     print("EXITING...")
     sys.exit()
 
