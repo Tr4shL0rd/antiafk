@@ -1,12 +1,14 @@
+"""moves the mouse every 60 seconds to prevent the machine going to sleep"""
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from typing import Tuple
 from sys import argv
-import pyautogui
-from pyautogui import Point
+import sys
 from time import sleep
 import datetime
+import pyautogui
+from pyautogui import Point
 
 DEBUG = False
 try:
@@ -36,7 +38,7 @@ def get_current_time() -> str:
     return time_str
 
 
-def split_xy(xy: Point) -> Tuple[float, float]:
+def split_xy(xy_pos: Point) -> Tuple[float, float]:
     """
     Split a tuple of x and y coordinates into separate variables.
 
@@ -53,12 +55,13 @@ def split_xy(xy: Point) -> Tuple[float, float]:
     * Does the same as x,y = xy[0], xy[1]
     """
 
-    return (xy[0], xy[1])
+    return (xy_pos[0], xy_pos[1])
 
 
-def is_near(xy: Point, center_x: int, center_y: int, radius: int) -> bool:
+def is_near(xy_pos: Point, center_x: int, center_y: int, radius: int) -> bool:
     """
-    Check if the position (x, y) is within a certain distance of the center position (center_x, center_y).
+    Check if the position (x, y) is within a certain distance of the center position
+    (center_x, center_y).
 
     Parameters:
     ----------
@@ -66,11 +69,13 @@ def is_near(xy: Point, center_x: int, center_y: int, radius: int) -> bool:
     * y        `int`: The y-coordinate of the position to check.
     * center_x `int`: The x-coordinate of the center position.
     * center_y `int`: The y-coordinate of the center position.
-    * radius   `int`: The maximum distance from the center position that the position (x, y) is allowed to be.
+    * radius   `int`: The maximum distance from the center position that the position (x, y) is
+        allowed to be.
 
     Returns:
     -------
-    * bool: True if the distance between the two positions is less than or equal to the given radius, False otherwise.
+    * bool: True if the distance between the two positions is less than or equal to the given
+    radius, False otherwise.
 
     Note:
     ----
@@ -78,13 +83,13 @@ def is_near(xy: Point, center_x: int, center_y: int, radius: int) -> bool:
     """
 
     # Calculate the distance between the given position and the center position
-    x, y = split_xy(xy)
-    distance = ((x - center_x) ** 2 + (y - center_y) ** 2) ** 0.5
+    x_pos, y_pos = split_xy(xy_pos)
+    distance = ((x_pos - center_x) ** 2 + (y_pos - center_y) ** 2) ** 0.5
     # Return whether the distance is less than or equal to the given radius
     return bool(distance <= radius)
 
 
-def jiggle_mouse(xy: Point) -> None:
+def jiggle_mouse(xy_pos: Point) -> None:
     """
     Jiggle the mouse around the given position (x, y).
 
@@ -97,20 +102,21 @@ def jiggle_mouse(xy: Point) -> None:
     * None
     """
 
-    x, y = split_xy(xy)
-    pyautogui.moveTo(x, y + 1)
+    x_pos, y_pos = split_xy(xy_pos)
+    pyautogui.moveTo(x_pos, y_pos + 1)
 
 
 CENTER_LEFT = (1, 500)
 SLEEP_TIME = 60 if not DEBUG else int(argv[1])
 ORIGIN = pyautogui.position()
-with open("logs/mouse_mover.log", "a") as f:
-    f.write(
+with open("logs/mouse_mover.log", "a", encoding="utf8") as log_file:
+    log_file.write(
         f"{get_current_time()}: STARTING at position {ORIGIN} |{DEBUG = }|{SLEEP_TIME = }|\n"
     )
 
 
 def main() -> None:
+    """main entry point of script"""
     pos = Point(pyautogui.position()[0], pyautogui.position()[1])
     pyautogui.moveTo(CENTER_LEFT)
     while is_near(
@@ -126,23 +132,23 @@ def main() -> None:
             )
             sleep(1)
         pyautogui.moveTo(pos)  # resets mouse pos
-        with open("logs/mouse_mover.log", "a") as f:
-            f.write(f"{get_current_time()}: MOVED TO {split_xy(pos)}\n")
+        with open("logs/mouse_mover.log", "a", encoding="utf8") as log_file_move:
+            log_file_move.write(f"{get_current_time()}: MOVED TO {split_xy(pos)}\n")
     print("stopped")
-    with open("logs/mouse_mover.log", "a") as f:
-        f.write(f"{get_current_time()}: STOPPED by moving mouse\n")
+    with open("logs/mouse_mover.log", "a", encoding="utf8") as log_file_stopped_move:
+        log_file_stopped_move.write(f"{get_current_time()}: STOPPED by moving mouse\n")
 
 
 try:
     if __name__ == "__main__":
         main()
 except KeyboardInterrupt:
-    with open("logs/mouse_mover.log", "a") as f:
-        f.write(f"{get_current_time()}: STOPPED by KeyboardInterrut\n")
+    with open("logs/mouse_mover.log", "a", encoding="utf8") as log_file:
+        log_file.write(f"{get_current_time()}: STOPPED by KeyboardInterrut\n")
     print("EXITING...")
-    exit()
+    sys.exit()
 
 except pyautogui.FailSafeException:
-    with open("logs/mouse_mover.log", "a") as f:
-        f.write(f"{get_current_time()}: COULD NOT START! mouse in a corner\n")
+    with open("logs/mouse_mover.log", "a", encoding="utf8") as log_file:
+        log_file.write(f"{get_current_time()}: COULD NOT START! mouse in a corner\n")
     print("please move mouse away from corner!")
