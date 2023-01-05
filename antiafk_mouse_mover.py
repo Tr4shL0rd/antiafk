@@ -7,8 +7,11 @@ from sys import argv
 import sys
 from time import sleep
 import datetime
+import logging
 import pyautogui
 from pyautogui import Point
+
+logging.basicConfig(filename="logs/mouse_mover.log", encoding="utf-8", format="%(asctime)s: %(message)s", level=logging.INFO)
 
 DEBUG = False
 try:
@@ -109,11 +112,8 @@ def jiggle_mouse(xy_pos: Point) -> None:
 CENTER_LEFT = (1, 500)
 SLEEP_TIME = 60 if not DEBUG else int(argv[1])
 ORIGIN = pyautogui.position()
-with open("logs/mouse_mover.log", "a", encoding="utf8") as log_file:
-    log_file.write(
-        f"{get_current_time()}: STARTING at position {ORIGIN} |{DEBUG = }|{SLEEP_TIME = }|\n"
-    )
 
+logging.info(f"STARTING at position {ORIGIN} |{DEBUG = }|{SLEEP_TIME = }|")
 
 def main() -> None:
     """main entry point of script"""
@@ -132,23 +132,20 @@ def main() -> None:
             )
             sleep(1)
         pyautogui.moveTo(pos)  # resets mouse pos
-        with open("logs/mouse_mover.log", "a", encoding="utf8") as log_file_move:
-            log_file_move.write(f"{get_current_time()}: MOVED TO {split_xy(pos)}\n")
+        logging.info(f"MOVED TO {split_xy(pos)}")
     print("stopped")
-    with open("logs/mouse_mover.log", "a", encoding="utf8") as log_file_stopped_move:
-        log_file_stopped_move.write(f"{get_current_time()}: STOPPED by moving mouse\n")
+    logging.info(f"STOPPED by moving mouse")
 
 
 try:
     if __name__ == "__main__":
+        pyautogui.moveTo(CENTER_LEFT)
         main()
 except KeyboardInterrupt:
-    with open("logs/mouse_mover.log", "a", encoding="utf8") as log_file:
-        log_file.write(f"{get_current_time()}: STOPPED by KeyboardInterrupt\n")
+    logging.info(f"STOPPED by KeyboardInterrupt")
     print("EXITING...")
     sys.exit()
 
 except pyautogui.FailSafeException:
-    with open("logs/mouse_mover.log", "a", encoding="utf8") as log_file:
-        log_file.write(f"{get_current_time()}: COULD NOT START! mouse in a corner\n")
+    logging.info("COULD NOT START! mouse in a corner")
     print("please move mouse away from corner!")
