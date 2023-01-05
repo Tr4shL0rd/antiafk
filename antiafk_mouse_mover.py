@@ -144,7 +144,7 @@ try:
         main()
 except KeyboardInterrupt:
     with open("logs/mouse_mover.log", "a", encoding="utf8") as log_file:
-        log_file.write(f"{get_current_time()}: STOPPED by KeyboardInterrut\n")
+        log_file.write(f"{get_current_time()}: STOPPED by KeyboardInterrupt\n")
     print("EXITING...")
     sys.exit()
 
